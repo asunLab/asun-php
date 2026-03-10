@@ -42,19 +42,19 @@ ASON (~35 tokens, 65% saving):
 
 ### Deep Nesting (5-Level Deep)
 
-| Scenario      | json_decode | ason_decode | Speedup    |
-| ------------- | ----------- | ----------- | ---------- |
-| 10 Companies  | 30.38 ms    | 0.42 ms     | **72.34x** |
-| 50 Companies  | 148.92 ms   | 1.92 ms     | **77.51x** |
-| 100 Companies | 325.97 ms   | 3.88 ms     | **83.91x** |
+| Scenario           | json_decode | ason_decode | Speedup    |
+| ------------------ | ----------- | ----------- | ---------- |
+| 10 Companies       | 30.38 ms    | 0.42 ms     | **72.34x** |
+| 50 Companies       | 148.92 ms   | 1.92 ms     | **77.51x** |
+| 100 Companies      | 325.97 ms   | 3.88 ms     | **83.91x** |
 
 ### Size Savings
 
-| Scenario           | JSON      | ASON Text | ASON Bin  | Saving (Text/Bin) |
-| ------------------ | --------- | --------- | --------- | ----------------- |
-| Flat struct × 100  | 12,071 B  | 5,614 B   | 7,446 B   | **53% / 38%**     |
-| Flat struct × 5000 | 612,808 B | 287,851 B | 372,250 B | **53% / 39%**     |
-| 100 Companies      | 431,612 B | 231,011 B | 251,830 B | **46% / 42%**     |
+| Scenario           | JSON      | ASON Text | ASON Bin | Saving (Text/Bin) |
+| ------------------ | --------- | --------- | -------- | ----------------- |
+| Flat struct × 100  | 12,071 B  | 5,614 B   | 7,446 B  | **53% / 38%**     |
+| Flat struct × 5000 | 612,808 B | 287,851 B | 372,250 B| **53% / 39%**     |
+| 100 Companies      | 431,612 B | 231,011 B | 251,830 B| **46% / 42%**     |
 
 ## Features
 
@@ -87,22 +87,21 @@ extension=ason.so
 ```
 
 Or use per-command:
-
 ```bash
 php -d extension=path/to/modules/ason.so your_script.php
 ```
 
 ## API Reference
 
-| Function                           | Description                                      |
-| ---------------------------------- | ------------------------------------------------ |
-| `ason_encode($data)`               | Encode to ASON format                            |
-| `ason_decode($string)`             | Decode ASON string to PHP value                  |
-| `ason_encodeBinary($data)`         | Encode to ASON binary format                     |
-| `ason_decodeBinary($str, $schema)` | Decode binary with type schema                   |
-| `ason_encodeTyped($data)`          | Encode with type annotations in schema           |
-| `ason_encodePretty($data)`         | Encode with pretty formatting                    |
-| `ason_encodePrettyTyped($data)`    | Encode with pretty formatting + type annotations |
+| Function                    | Description                                          |
+| --------------------------- | ---------------------------------------------------- |
+| `ason_encode($data)`        | Encode to ASON format                                |
+| `ason_decode($string)`      | Decode ASON string to PHP value                      |
+| `ason_encodeBinary($data)`  | Encode to ASON binary format                         |
+| `ason_decodeBinary($str, $schema)` | Decode binary with type schema              |
+| `ason_encodeTyped($data)`   | Encode with type annotations in schema               |
+| `ason_encodePretty($data)`  | Encode with pretty formatting                        |
+| `ason_encodePrettyTyped($data)` | Encode with pretty formatting + type annotations |
 
 ## Quick Start
 
@@ -144,7 +143,7 @@ echo strlen($bin); // 18 bytes vs 36 bytes text
 // Decode with type schema
 $decoded = ason_decodeBinary($bin, [
     'id' => 'int',
-    'name' => 'str',
+    'name' => 'str', 
     'active' => 'bool',
 ]);
 ```
@@ -190,7 +189,7 @@ php -d extension=modules/ason.so examples/bench.php
 
 ## Test Suite
 
-Comprehensive test coverage:
+Basic test coverage:
 
 - ✅ Struct encode/decode roundtrip
 - ✅ Typed schema encode

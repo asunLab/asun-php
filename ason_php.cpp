@@ -153,6 +153,7 @@ static void decode_value_to_zval(const char*& p, const char* e, zval* rv);
 
 static void decode_array_values(const char*& p, const char* e, const Schema& schema, zval* rv) {
     array_init(rv);
+    int parsed = 0;
     for (int i = 0; i < schema.count; i++) {
         skip_ws_comments(p, e);
         if (p < e && *p == ')') break;
@@ -169,7 +170,18 @@ static void decode_array_values(const char*& p, const char* e, const Schema& sch
         zend_string* key = zend_string_init(schema.fields[i].data(), schema.fields[i].size(), 0);
         zend_hash_add_new(Z_ARRVAL_P(rv), key, &field_val);
         zend_string_release(key);
+        parsed++;
     }
+    
+    // Pad remaining missing fields with NULL
+    for (int i = parsed; i < schema.count; i++) {
+        zval field_val;
+        ZVAL_NULL(&field_val);
+        zend_string* key = zend_string_init(schema.fields[i].data(), schema.fields[i].size(), 0);
+        zend_hash_add_new(Z_ARRVAL_P(rv), key, &field_val);
+        zend_string_release(key);
+    }
+
     // skip remaining
     for (;;) {
         skip_ws_comments(p, e);
@@ -387,6 +399,36 @@ static void decode_bin_to_zval(const char*& p, const char* e, zval* rv, zval* ty
         ZVAL_NULL(rv);
         return;
     }
+    
+    // Recursive schema handling for nested arrays/structs
+    if (Z_TYPE_P(type_hint) == IS_ARRAY) {
+        HashTable* ht = Z_ARRVAL_P(type_hint);
+        if (p + 4 > e) { ZVAL_NULL(rv); return; }
+        uint32_t cnt; memcpy(&cnt, p, 4); p += 4;  // nested arrays always have count
+        
+        array_init(rv);
+        if (is_sequential_array(ht)) {
+            // Nested vector
+            zval* inner_hint = zend_hash_index_find(ht, 0);
+            for (uint32_t i = 0; i < cnt && p < e; i++) {
+                zval el;
+                decode_bin_to_zval(p, e, &el, inner_hint);
+                zend_hash_next_index_insert(Z_ARRVAL_P(rv), &el);
+            }
+        } else {
+            // Nested struct
+            zend_string* key;
+            zval* inner_hint;
+            ZEND_HASH_FOREACH_STR_KEY_VAL(ht, key, inner_hint) {
+                if (!key) continue;
+                zval field;
+                decode_bin_to_zval(p, e, &field, inner_hint);
+                zend_hash_add_new(Z_ARRVAL_P(rv), key, &field);
+            } ZEND_HASH_FOREACH_END();
+        }
+        return;
+    }
+
     if (Z_TYPE_P(type_hint) != IS_STRING) { ZVAL_NULL(rv); return; }
     const char* t = Z_STRVAL_P(type_hint);
     size_t tlen = Z_STRLEN_P(type_hint);
