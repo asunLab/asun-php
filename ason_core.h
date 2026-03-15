@@ -220,6 +220,48 @@ struct Schema {
     int count = 0;
 };
 
+inline Schema parse_schema(const char*& p, const char* e);
+
+inline void validate_schema_scalar_type(const char*& p, const char* e) {
+    const char* start = p;
+    while (p < e) {
+        char b = *p;
+        if (b == ',' || b == '}' || b == ']' || b == ' ' || b == '\t') break;
+        p++;
+    }
+    std::string token(start, p - start);
+    if (token.empty()) throw Error("expected schema type after '@'");
+    if (!token.empty() && token.back() == '?') token.pop_back();
+    if (token == "int" || token == "str" || token == "float" || token == "bool") return;
+    throw Error("unsupported schema type '" + token + "'; use int, str, float, or bool");
+}
+
+inline void validate_schema_annotation(const char*& p, const char* e) {
+    if (p >= e) throw Error("expected schema type after '@'");
+    if (*p == '{') {
+        (void)parse_schema(p, e);
+        return;
+    }
+    if (*p == '[') {
+        p++;
+        skip_ws(p, e);
+        if (p < e && *p == ']') {
+            p++;
+            return;
+        }
+        if (p < e && *p == '{') {
+            (void)parse_schema(p, e);
+        } else {
+            validate_schema_scalar_type(p, e);
+        }
+        skip_ws(p, e);
+        if (p >= e || *p != ']') throw Error("expected ']' in array type annotation");
+        p++;
+        return;
+    }
+    validate_schema_scalar_type(p, e);
+}
+
 inline Schema parse_schema(const char*& p, const char* e) {
     if (p >= e || *p != '{') throw Error("expected '{'");
     p++; Schema s;
@@ -243,16 +285,7 @@ inline Schema parse_schema(const char*& p, const char* e) {
         skip_ws(p, e);
         if (p < e && *p == '@') {
             p++; skip_ws(p, e);
-            if (p < e && *p == '{') { int d = 0; while (p < e) { if (*p == '{') d++; else if (*p == '}') { d--; if (d == 0) { p++; break; } } p++; } }
-            else if (p < e && *p == '[') { int d = 0; while (p < e) { if (*p == '[') d++; else if (*p == ']') { d--; if (d == 0) { p++; break; } } p++; } }
-            else {
-                while (p < e) {
-                    char b = *p;
-                    if (b == '<' || b == '>') throw Error("legacy map syntax '<...>' is not supported");
-                    if (b == ',' || b == '}' || b == ' ' || b == '\t') break;
-                    p++;
-                }
-            }
+            validate_schema_annotation(p, e);
         }
     }
     return s;
