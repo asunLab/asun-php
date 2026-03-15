@@ -94,6 +94,32 @@ inline void append_str(std::string& buf, const char* s, size_t len) {
     if (needs_quoting(s, len)) append_escaped(buf, s, len); else buf.append(s, len);
 }
 
+inline bool schema_name_needs_quoting(const char* s, size_t len) {
+    if (len == 0) return true;
+    if ((len == 4 && std::memcmp(s, "true", 4) == 0) ||
+        (len == 5 && std::memcmp(s, "false", 5) == 0)) return true;
+    if (s[0] == ' ' || s[len - 1] == ' ') return true;
+    bool could_num = true;
+    size_t num_start = (s[0] == '-') ? 1 : 0;
+    if (num_start >= len) could_num = false;
+    for (size_t i = 0; i < len; i++) {
+        unsigned char b = static_cast<unsigned char>(s[i]);
+        if (b <= 0x20 || b == ',' || b == '@' || b == ':' || b == '{' || b == '}' ||
+            b == '[' || b == ']' || b == '(' || b == ')' || b == '"' || b == '\\') {
+            return true;
+        }
+        if (could_num && i >= num_start && !((b >= '0' && b <= '9') || b == '.')) {
+            could_num = false;
+        }
+    }
+    return could_num && len > num_start;
+}
+
+inline void append_schema_name(std::string& buf, const char* s, size_t len) {
+    if (schema_name_needs_quoting(s, len)) append_escaped(buf, s, len);
+    else buf.append(s, len);
+}
+
 // ---- Parser ----
 inline void skip_ws(const char*& p, const char* e) {
     while (p < e && (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')) p++;
@@ -190,7 +216,7 @@ inline void skip_value(const char*& p, const char* e) {
 
 struct Schema {
     static constexpr int MAX = 64;
-    std::string_view fields[MAX];
+    std::string fields[MAX];
     int count = 0;
 };
 
@@ -201,14 +227,19 @@ inline Schema parse_schema(const char*& p, const char* e) {
         skip_ws(p, e); if (p >= e) throw Error("eof in schema");
         if (*p == '}') { p++; break; }
         if (s.count > 0) { if (*p != ',') throw Error("expected ','"); p++; skip_ws(p, e); }
-        const char* st = p;
-        while (p < e) {
-            char b = *p;
-            if (b == '<' || b == '>') throw Error("legacy map syntax '<...>' is not supported");
-            if (b == ',' || b == '}' || b == '@' || b == ' ' || b == '\t') break;
-            p++;
+        if (p < e && *p == '"') {
+            auto name = parse_quoted(p, e);
+            if (s.count < Schema::MAX) s.fields[s.count++] = std::move(name);
+        } else {
+            const char* st = p;
+            while (p < e) {
+                char b = *p;
+                if (b == '<' || b == '>') throw Error("legacy map syntax '<...>' is not supported");
+                if (b == ',' || b == '}' || b == '@' || b == ' ' || b == '\t') break;
+                p++;
+            }
+            if (s.count < Schema::MAX) s.fields[s.count++] = std::string(st, p - st);
         }
-        if (s.count < Schema::MAX) s.fields[s.count++] = std::string_view(st, p - st);
         skip_ws(p, e);
         if (p < e && *p == '@') {
             p++; skip_ws(p, e);

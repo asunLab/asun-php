@@ -36,12 +36,17 @@ static void encode_array_schema(std::string& buf, zval* val, bool typed) {
     zend_ulong idx;
     bool first = true;
     ZEND_HASH_FOREACH_KEY(ht, idx, key) {
-        if (!key) continue;
         if (!first) buf.push_back(',');
         first = false;
-        buf.append(ZSTR_VAL(key), ZSTR_LEN(key));
+        if (key) {
+            append_schema_name(buf, ZSTR_VAL(key), ZSTR_LEN(key));
+        } else {
+            char numbuf[32];
+            int n = std::snprintf(numbuf, sizeof(numbuf), "%lu", idx);
+            append_schema_name(buf, numbuf, (size_t)n);
+        }
         if (typed) {
-            zval* v = zend_hash_find(ht, key);
+            zval* v = key ? zend_hash_find(ht, key) : zend_hash_index_find(ht, idx);
             if (v) {
                 buf.push_back('@');
                 append_schema_type(buf, v);
@@ -683,12 +688,20 @@ PHP_FUNCTION(ason_decodeBinary) {
             // Assoc schema like ['id' => 'int', 'name' => 'str']
             array_init(return_value);
             zend_string* key;
+            zend_ulong idx;
             zval* type_val;
-            ZEND_HASH_FOREACH_STR_KEY_VAL(ht, key, type_val) {
-                if (!key) continue;
+            ZEND_HASH_FOREACH_KEY_VAL(ht, idx, key, type_val) {
                 zval field;
                 decode_bin_to_zval(p, e, &field, type_val);
-                zend_hash_add_new(Z_ARRVAL_P(return_value), key, &field);
+                if (key) {
+                    zend_hash_add_new(Z_ARRVAL_P(return_value), key, &field);
+                } else {
+                    char numbuf[32];
+                    int n = std::snprintf(numbuf, sizeof(numbuf), "%lu", idx);
+                    zend_string* skey = zend_string_init(numbuf, (size_t)n, 0);
+                    zend_hash_add_new(Z_ARRVAL_P(return_value), skey, &field);
+                    zend_string_release(skey);
+                }
             } ZEND_HASH_FOREACH_END();
         }
     } catch (const std::exception& ex) {
