@@ -628,6 +628,10 @@ PHP_FUNCTION(ason_decode) {
         const char* p = input;
         const char* e = input + input_len;
         decode_top(p, e, return_value);
+        skip_ws_comments(p, e);
+        if (p < e) {
+            throw Error("unexpected trailing data after top-level value");
+        }
     } catch (const std::exception& ex) {
         zend_throw_exception(zend_ce_exception, ex.what(), 0);
         RETURN_THROWS();
