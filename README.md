@@ -22,7 +22,8 @@ ASON (~35 tokens, 65% saving):
 
 ## Current Syntax
 
-- Field type annotations use `@`, for example `{id@int,name@str}`.
+- `@` is the field binding marker, for example `{id@int,name@str}`.
+- Scalar hints such as `@int` and `@str` are optional; structural bindings such as `@{...}` and `@[...]` are required for complex fields.
 - Header/body separation stays `:`, for example `{id@int,name@str}:(1,Alice)`.
 - Dedicated map syntax has been removed. Key-value collections should be modeled as entry-object lists such as `attrs@[{key@str,value@int}]`.
 
@@ -105,9 +106,9 @@ php -d extension=path/to/modules/ason.so your_script.php
 | `ason_decode($string)`      | Decode ASON string to PHP value                      |
 | `ason_encodeBinary($data)`  | Encode to ASON binary format                         |
 | `ason_decodeBinary($str, $schema)` | Decode binary with type schema              |
-| `ason_encodeTyped($data)`   | Encode with type annotations in schema               |
+| `ason_encodeTyped($data)`   | Encode with scalar type hints in schema              |
 | `ason_encodePretty($data)`  | Encode with pretty formatting                        |
-| `ason_encodePrettyTyped($data)` | Encode with pretty formatting + type annotations |
+| `ason_encodePrettyTyped($data)` | Encode with pretty formatting + scalar type hints |
 
 ## Quick Start
 
@@ -119,7 +120,7 @@ $user = ['id' => 1, 'name' => 'Alice', 'active' => true];
 $ason = ason_encode($user);
 // → "{id,name,active}:(1,Alice,true)"
 
-// With type annotations
+// With scalar type hints
 $typed = ason_encodeTyped($user);
 // → "{id@int,name@str,active@bool}:(1,Alice,true)"
 

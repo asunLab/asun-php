@@ -22,7 +22,8 @@ ASON (~35 tokens, 节省 65%):
 
 ## 当前语法
 
-- 字段类型注解统一使用 `@`，例如 `{id@int,name@str}`。
+- `@` 是字段绑定符，例如 `{id@int,name@str}`。
+- 对基本类型来说，`@int`、`@str` 之类是可选提示；对复杂字段来说，`@{...}` 和 `@[...]` 是必需的结构绑定。
 - header / body 之间仍然使用 `:` 分隔，例如 `{id@int,name@str}:(1,Alice)`。
 - 专用 map 语法已经移除。键值集合请改用 entry-object list，例如 `attrs@[{key@str,value@int}]`。
 
@@ -105,9 +106,9 @@ php -d extension=path/to/modules/ason.so your_script.php
 | `ason_decode($string)`            | 解码 ASON 字符串为 PHP 值       |
 | `ason_encodeBinary($data)`        | 编码为 ASON 二进制格式          |
 | `ason_decodeBinary($str, $schema)`| 使用类型模式解码二进制           |
-| `ason_encodeTyped($data)`         | 编码时在模式中包含类型注解       |
+| `ason_encodeTyped($data)`         | 编码时在模式中包含基本类型提示   |
 | `ason_encodePretty($data)`        | 编码为美化格式                  |
-| `ason_encodePrettyTyped($data)`   | 编码为美化格式 + 类型注解        |
+| `ason_encodePrettyTyped($data)`   | 编码为美化格式 + 基本类型提示    |
 
 ## 快速开始
 
@@ -119,7 +120,7 @@ $user = ['id' => 1, 'name' => 'Alice', 'active' => true];
 $ason = ason_encode($user);
 // → "{id,name,active}:(1,Alice,true)"
 
-// 带类型注解
+// 带基本类型提示
 $typed = ason_encodeTyped($user);
 // → "{id@int,name@str,active@bool}:(1,Alice,true)"
 
