@@ -4,20 +4,20 @@
 
 #if defined(__x86_64__) || defined(_M_X64)
 #include <immintrin.h>
-#define ASON_SSE2 1
+#define ASUN_SSE2 1
 #if defined(__AVX2__)
-#define ASON_AVX2 1
+#define ASUN_AVX2 1
 #endif
 #elif defined(__aarch64__) || defined(_M_ARM64)
 #include <arm_neon.h>
-#define ASON_NEON 1
+#define ASUN_NEON 1
 #endif
 
-namespace ason_simd {
+namespace asun_simd {
 
 static constexpr int LANES = 16;
 
-#if defined(ASON_NEON)
+#if defined(ASUN_NEON)
 inline uint16_t movemask(uint8x16_t v) {
     uint16x8_t high_bits = vreinterpretq_u16_u8(vshrq_n_u8(v, 7));
     uint32x4_t paired16  = vreinterpretq_u32_u16(vsraq_n_u16(high_bits, high_bits, 7));
@@ -58,7 +58,7 @@ inline bool has_special_chars(const uint8_t* ptr, size_t len) {
     }
     return false;
 }
-#elif defined(ASON_SSE2)
+#elif defined(ASUN_SSE2)
 inline size_t find_quote_or_special(const uint8_t* ptr, size_t len) {
     size_t i = 0;
     __m128i vq = _mm_set1_epi8('"'), vb = _mm_set1_epi8('\\'), vc = _mm_set1_epi8(0x1F);
@@ -105,4 +105,4 @@ inline bool has_special_chars(const uint8_t* ptr, size_t len) {
 }
 #endif
 
-} // namespace ason_simd
+} // namespace asun_simd

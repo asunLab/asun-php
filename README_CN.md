@@ -1,22 +1,22 @@
-# ason-php
+# asun-php
 
 [![PHP 8.4+](https://img.shields.io/badge/PHP-8.4%2B-blue.svg)](https://www.php.net/)
 [![C++ Extension](https://img.shields.io/badge/type-C%2B%2B%20扩展-green.svg)](#)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-高性能 PHP C++ 扩展，用于 [ASON](https://github.com/ason-lab/ason)（Array-Schema Object Notation）—— SIMD 加速（SSE2/AVX2/NEON），零拷贝解析，直接调用 Zend API，无中间层。
+高性能 PHP C++ 扩展，用于 [ASUN](https://github.com/asun-lab/asun)（Array-Schema Unified Notation）—— SIMD 加速（SSE2/AVX2/NEON），零拷贝解析，直接调用 Zend API，无中间层。
 
 [English](README.md)
 
-## 什么是 ASON？
+## 什么是 ASUN？
 
-ASON 将**模式**与**数据**分离，消除了 JSON 中的重复键：
+ASUN 将**模式**与**数据**分离，消除了 JSON 中的重复键：
 
 ```text
 JSON (100 tokens):
 {"users":[{"id":1,"name":"Alice","active":true},{"id":2,"name":"Bob","active":false}]}
 
-ASON (~35 tokens, 节省 65%):
+ASUN (~35 tokens, 节省 65%):
 [{id@int, name@str, active@bool}]:(1,Alice,true),(2,Bob,false)
 ```
 
@@ -29,35 +29,35 @@ ASON (~35 tokens, 节省 65%):
 
 ## 性能 (PHP 8.4, x86_64 SSE2/AVX2)
 
-### 序列化 (ASON 比 json_encode 快 2.7–4.1 倍)
+### 序列化 (ASUN 比 json_encode 快 2.7–4.1 倍)
 
-| 场景               | json_encode | ason_encode | 加速比    |
-| ------------------ | ----------- | ----------- | --------- |
-| 扁平结构 × 100     | 3.66 ms     | 0.88 ms     | **4.16x** |
-| 扁平结构 × 500     | 15.02 ms    | 4.03 ms     | **3.73x** |
-| 扁平结构 × 1000    | 31.89 ms    | 8.66 ms     | **3.68x** |
-| 扁平结构 × 5000    | 152.69 ms   | 56.63 ms    | **2.70x** |
+| 场景            | json_encode | asun_encode | 加速比    |
+| --------------- | ----------- | ----------- | --------- |
+| 扁平结构 × 100  | 3.66 ms     | 0.88 ms     | **4.16x** |
+| 扁平结构 × 500  | 15.02 ms    | 4.03 ms     | **3.73x** |
+| 扁平结构 × 1000 | 31.89 ms    | 8.66 ms     | **3.68x** |
+| 扁平结构 × 5000 | 152.69 ms   | 56.63 ms    | **2.70x** |
 
-### 反序列化 (ASON 比 json_decode 快 2.2–2.5 倍)
+### 反序列化 (ASUN 比 json_decode 快 2.2–2.5 倍)
 
-| 场景               | json_decode | ason_decode | 加速比    |
-| ------------------ | ----------- | ----------- | --------- |
-| 扁平结构 × 100     | 7.13 ms     | 2.93 ms     | **2.43x** |
-| 扁平结构 × 500     | 35.35 ms    | 16.03 ms    | **2.21x** |
-| 扁平结构 × 1000    | 69.06 ms    | 29.83 ms    | **2.32x** |
-| 扁平结构 × 5000    | 347.81 ms   | 154.45 ms   | **2.25x** |
+| 场景            | json_decode | asun_decode | 加速比    |
+| --------------- | ----------- | ----------- | --------- |
+| 扁平结构 × 100  | 7.13 ms     | 2.93 ms     | **2.43x** |
+| 扁平结构 × 500  | 35.35 ms    | 16.03 ms    | **2.21x** |
+| 扁平结构 × 1000 | 69.06 ms    | 29.83 ms    | **2.32x** |
+| 扁平结构 × 5000 | 347.81 ms   | 154.45 ms   | **2.25x** |
 
 ### 极深嵌套处理 (5层级嵌套反序列化)
 
-| 场景             | json_decode | ason_decode | 加速比    |
-| ---------------- | ----------- | ----------- | --------- |
-| 10 家跨国公司级  | 30.38 ms    | 0.42 ms     | **72.34x**|
-| 50 家跨国公司级  | 148.92 ms   | 1.92 ms     | **77.51x**|
-| 100 家跨国公司级 | 325.97 ms   | 3.88 ms     | **83.91x**|
+| 场景             | json_decode | asun_decode | 加速比     |
+| ---------------- | ----------- | ----------- | ---------- |
+| 10 家跨国公司级  | 30.38 ms    | 0.42 ms     | **72.34x** |
+| 50 家跨国公司级  | 148.92 ms   | 1.92 ms     | **77.51x** |
+| 100 家跨国公司级 | 325.97 ms   | 3.88 ms     | **83.91x** |
 
-### 体积节省 (带 ASON Binary 压缩版)
+### 体积节省 (带 ASUN Binary 压缩版)
 
-| 场景               | JSON      | ASON 文本 | ASON 二进制 | 节省比例 (文本/二进) |
+| 场景               | JSON      | ASUN 文本 | ASUN 二进制 | 节省比例 (文本/二进) |
 | ------------------ | --------- | --------- | ----------- | -------------------- |
 | 扁平结构 × 100     | 12,071 B  | 5,614 B   | 7,446 B     | **53% / 38%**        |
 | 扁平结构 × 5000    | 612,808 B | 287,851 B | 372,250 B   | **53% / 39%**        |
@@ -78,9 +78,9 @@ ASON (~35 tokens, 节省 65%):
 ### 从源码编译
 
 ```bash
-cd ason-php
+cd asun-php
 phpize
-./configure --enable-ason
+./configure --enable-asun
 make -j$(nproc)
 # 可选：系统级安装
 sudo make install
@@ -90,25 +90,26 @@ sudo make install
 
 ```ini
 ; php.ini
-extension=ason.so
+extension=asun.so
 ```
 
 或命令行使用：
+
 ```bash
-php -d extension=path/to/modules/ason.so your_script.php
+php -d extension=path/to/modules/asun.so your_script.php
 ```
 
 ## API 参考
 
-| 函数                              | 说明                           |
-| --------------------------------- | ------------------------------ |
-| `ason_encode($data)`              | 编码为 ASON 格式                |
-| `ason_decode($string)`            | 解码 ASON 字符串为 PHP 值       |
-| `ason_encodeBinary($data)`        | 编码为 ASON 二进制格式          |
-| `ason_decodeBinary($str, $schema)`| 使用类型模式解码二进制           |
-| `ason_encodeTyped($data)`         | 编码时在模式中包含基本类型提示   |
-| `ason_encodePretty($data)`        | 编码为美化格式                  |
-| `ason_encodePrettyTyped($data)`   | 编码为美化格式 + 基本类型提示    |
+| 函数                               | 说明                           |
+| ---------------------------------- | ------------------------------ |
+| `asun_encode($data)`               | 编码为 ASUN 格式               |
+| `asun_decode($string)`             | 解码 ASUN 字符串为 PHP 值      |
+| `asun_encodeBinary($data)`         | 编码为 ASUN 二进制格式         |
+| `asun_decodeBinary($str, $schema)` | 使用类型模式解码二进制         |
+| `asun_encodeTyped($data)`          | 编码时在模式中包含基本类型提示 |
+| `asun_encodePretty($data)`         | 编码为美化格式                 |
+| `asun_encodePrettyTyped($data)`    | 编码为美化格式 + 基本类型提示  |
 
 ## 快速开始
 
@@ -117,15 +118,15 @@ php -d extension=path/to/modules/ason.so your_script.php
 
 // 序列化结构体（关联数组）
 $user = ['id' => 1, 'name' => 'Alice', 'active' => true];
-$ason = ason_encode($user);
+$asun = asun_encode($user);
 // → "{id,name,active}:(1,Alice,true)"
 
 // 带基本类型提示
-$typed = ason_encodeTyped($user);
+$typed = asun_encodeTyped($user);
 // → "{id@int,name@str,active@bool}:(1,Alice,true)"
 
 // 反序列化
-$decoded = ason_decode($ason);
+$decoded = asun_decode($asun);
 // → ['id' => 1, 'name' => 'Alice', 'active' => true]
 
 // 结构体数组 —— 模式只写一次
@@ -133,7 +134,7 @@ $users = [
     ['id' => 1, 'name' => 'Alice', 'active' => true],
     ['id' => 2, 'name' => 'Bob', 'active' => false],
 ];
-$vec = ason_encode($users);
+$vec = asun_encode($users);
 // → "[{id,name,active}]:(1,Alice,true),(2,Bob,false)"
 ```
 
@@ -144,11 +145,11 @@ $vec = ason_encode($users);
 $user = ['id' => 42, 'name' => 'Alice', 'active' => true];
 
 // 编码为二进制（紧凑、快速）
-$bin = ason_encodeBinary($user);
+$bin = asun_encodeBinary($user);
 echo strlen($bin); // 18 字节 vs 36 字节文本
 
 // 使用类型模式解码
-$decoded = ason_decodeBinary($bin, [
+$decoded = asun_decodeBinary($bin, [
     'id' => 'int',
     'name' => 'str',
     'active' => 'bool',
@@ -164,7 +165,7 @@ $users = [
     ['id' => 2, 'name' => 'Bob', 'active' => false],
 ];
 
-echo ason_encodePrettyTyped($users);
+echo asun_encodePrettyTyped($users);
 // [{id@int, name@str, active@bool}]:
 //   (1, Alice, true),
 //   (2, Bob, false)
@@ -176,16 +177,16 @@ echo ason_encodePrettyTyped($users);
 
 ```bash
 # 运行基础用法示例
-php -d extension=modules/ason.so examples/basic.php
+php -d extension=modules/asun.so examples/basic.php
 
 # 运行复杂嵌套结构示例
-php -d extension=modules/ason.so examples/complex.php
+php -d extension=modules/asun.so examples/complex.php
 
-# 运行性能基准测试 (JSON / ASON / BIN)
-php -d extension=modules/ason.so examples/bench.php
+# 运行性能基准测试 (JSON / ASUN / BIN)
+php -d extension=modules/asun.so examples/bench.php
 ```
 
-## 为什么 ASON 更快？
+## 为什么 ASUN 更快？
 
 1. **零键重复** —— 模式只写一次，数据行仅携带值
 2. **直接 Zend API** —— 无中间数据结构，直接构建 PHP `zval` 和 `HashTable`
@@ -214,10 +215,10 @@ php -d extension=modules/ason.so examples/bench.php
 
 ## IDE 支持
 
-复制 `stubs/ason.php` 到项目中以获得 IDE 自动补全：
+复制 `stubs/asun.php` 到项目中以获得 IDE 自动补全：
 
 ```bash
-cp stubs/ason.php /path/to/your/project/.stubs/
+cp stubs/asun.php /path/to/your/project/.stubs/
 ```
 
 然后在 IDE 中配置 stubs 目录。

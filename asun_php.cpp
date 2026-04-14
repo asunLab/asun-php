@@ -1,5 +1,5 @@
 // ============================================================================
-// ASON PHP Extension — High-performance SIMD-accelerated ASON codec
+// ASUN PHP Extension — High-performance SIMD-accelerated ASUN codec
 // Direct Zend API, zero intermediate layer, zero-copy where possible
 // ============================================================================
 
@@ -13,16 +13,16 @@ extern "C" {
 #include "zend_exceptions.h"
 }
 
-#include "ason_core.h"
+#include "asun_core.h"
 #include <string>
 #include <cstring>
 #include <functional>
 #include <vector>
 
-using namespace ason_core;
+using namespace asun_core;
 
 // ============================================================================
-// PHP → ASON Encoder (zval → string, zero intermediate structs)
+// PHP → ASUN Encoder (zval → string, zero intermediate structs)
 // ============================================================================
 
 static void encode_zval(std::string& buf, zval* val);
@@ -169,7 +169,7 @@ static void encode_zval(std::string& buf, zval* val) {
 }
 
 // ============================================================================
-// ASON → PHP Decoder (string → zval, direct Zend construction)
+// ASUN → PHP Decoder (string → zval, direct Zend construction)
 // ============================================================================
 
 static void decode_value_to_zval(const char*& p, const char* e, zval* rv);
@@ -481,7 +481,7 @@ static void decode_bin_to_zval(const char*& p, const char* e, zval* rv, zval* ty
 // Pretty format implementation
 // ============================================================================
 
-namespace ason_core {
+namespace asun_core {
 std::string pretty_format(const std::string& compact) {
     if (compact.empty()) return compact;
     auto mat = build_match_table(compact);
@@ -569,13 +569,13 @@ std::string pretty_format(const std::string& compact) {
     }
     return out;
 }
-} // namespace ason_core
+} // namespace asun_core
 
 // ============================================================================
 // PHP function implementations
 // ============================================================================
 
-PHP_FUNCTION(ason_encode) {
+PHP_FUNCTION(asun_encode) {
     zval* input;
     ZEND_PARSE_PARAMETERS_START(1, 1) Z_PARAM_ZVAL(input) ZEND_PARSE_PARAMETERS_END();
     try {
@@ -621,7 +621,7 @@ PHP_FUNCTION(ason_encode) {
     }
 }
 
-PHP_FUNCTION(ason_decode) {
+PHP_FUNCTION(asun_decode) {
     char* input; size_t input_len;
     ZEND_PARSE_PARAMETERS_START(1, 1) Z_PARAM_STRING(input, input_len) ZEND_PARSE_PARAMETERS_END();
     try {
@@ -638,7 +638,7 @@ PHP_FUNCTION(ason_decode) {
     }
 }
 
-PHP_FUNCTION(ason_encodeBinary) {
+PHP_FUNCTION(asun_encodeBinary) {
     zval* input;
     ZEND_PARSE_PARAMETERS_START(1, 1) Z_PARAM_ZVAL(input) ZEND_PARSE_PARAMETERS_END();
     try {
@@ -665,7 +665,7 @@ PHP_FUNCTION(ason_encodeBinary) {
     }
 }
 
-PHP_FUNCTION(ason_decodeBinary) {
+PHP_FUNCTION(asun_decodeBinary) {
     char* input; size_t input_len;
     zval* schema = nullptr;
     ZEND_PARSE_PARAMETERS_START(2, 2) Z_PARAM_STRING(input, input_len) Z_PARAM_ARRAY(schema) ZEND_PARSE_PARAMETERS_END();
@@ -714,7 +714,7 @@ PHP_FUNCTION(ason_decodeBinary) {
     }
 }
 
-PHP_FUNCTION(ason_encodeTyped) {
+PHP_FUNCTION(asun_encodeTyped) {
     zval* input;
     ZEND_PARSE_PARAMETERS_START(1, 1) Z_PARAM_ZVAL(input) ZEND_PARSE_PARAMETERS_END();
     try {
@@ -760,7 +760,7 @@ PHP_FUNCTION(ason_encodeTyped) {
     }
 }
 
-PHP_FUNCTION(ason_encodePretty) {
+PHP_FUNCTION(asun_encodePretty) {
     zval* input;
     ZEND_PARSE_PARAMETERS_START(1, 1) Z_PARAM_ZVAL(input) ZEND_PARSE_PARAMETERS_END();
     try {
@@ -807,7 +807,7 @@ PHP_FUNCTION(ason_encodePretty) {
     }
 }
 
-PHP_FUNCTION(ason_encodePrettyTyped) {
+PHP_FUNCTION(asun_encodePrettyTyped) {
     zval* input;
     ZEND_PARSE_PARAMETERS_START(1, 1) Z_PARAM_ZVAL(input) ZEND_PARSE_PARAMETERS_END();
     try {
@@ -858,56 +858,56 @@ PHP_FUNCTION(ason_encodePrettyTyped) {
 // Module definition
 // ============================================================================
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ason_encode, 0, 1, IS_STRING, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_asun_encode, 0, 1, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, data, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ason_decode, 0, 1, IS_MIXED, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_asun_decode, 0, 1, IS_MIXED, 0)
     ZEND_ARG_TYPE_INFO(0, input, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ason_encodeBinary, 0, 1, IS_STRING, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_asun_encodeBinary, 0, 1, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, data, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ason_decodeBinary, 0, 2, IS_MIXED, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_asun_decodeBinary, 0, 2, IS_MIXED, 0)
     ZEND_ARG_TYPE_INFO(0, input, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, schema, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ason_encodeTyped, 0, 1, IS_STRING, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_asun_encodeTyped, 0, 1, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, data, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ason_encodePretty, 0, 1, IS_STRING, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_asun_encodePretty, 0, 1, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, data, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_ason_encodePrettyTyped, 0, 1, IS_STRING, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_asun_encodePrettyTyped, 0, 1, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, data, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
-static const zend_function_entry ason_functions[] = {
-    PHP_FE(ason_encode,           arginfo_ason_encode)
-    PHP_FE(ason_decode,           arginfo_ason_decode)
-    PHP_FE(ason_encodeBinary,     arginfo_ason_encodeBinary)
-    PHP_FE(ason_decodeBinary,     arginfo_ason_decodeBinary)
-    PHP_FE(ason_encodeTyped,      arginfo_ason_encodeTyped)
-    PHP_FE(ason_encodePretty,     arginfo_ason_encodePretty)
-    PHP_FE(ason_encodePrettyTyped, arginfo_ason_encodePrettyTyped)
+static const zend_function_entry asun_functions[] = {
+    PHP_FE(asun_encode,           arginfo_asun_encode)
+    PHP_FE(asun_decode,           arginfo_asun_decode)
+    PHP_FE(asun_encodeBinary,     arginfo_asun_encodeBinary)
+    PHP_FE(asun_decodeBinary,     arginfo_asun_decodeBinary)
+    PHP_FE(asun_encodeTyped,      arginfo_asun_encodeTyped)
+    PHP_FE(asun_encodePretty,     arginfo_asun_encodePretty)
+    PHP_FE(asun_encodePrettyTyped, arginfo_asun_encodePrettyTyped)
     PHP_FE_END
 };
 
-PHP_MINFO_FUNCTION(ason) {
+PHP_MINFO_FUNCTION(asun) {
     php_info_print_table_start();
-    php_info_print_table_header(2, "ason support", "enabled");
+    php_info_print_table_header(2, "asun support", "enabled");
     php_info_print_table_row(2, "Version", "1.0.0");
     php_info_print_table_row(2, "SIMD",
-#if defined(ASON_AVX2)
+#if defined(ASUN_AVX2)
         "AVX2 + SSE2"
-#elif defined(ASON_SSE2)
+#elif defined(ASUN_SSE2)
         "SSE2"
-#elif defined(ASON_NEON)
+#elif defined(ASUN_NEON)
         "NEON (ARM64)"
 #else
         "Scalar fallback"
@@ -916,18 +916,18 @@ PHP_MINFO_FUNCTION(ason) {
     php_info_print_table_end();
 }
 
-zend_module_entry ason_module_entry = {
+zend_module_entry asun_module_entry = {
     STANDARD_MODULE_HEADER,
-    "ason",
-    ason_functions,
+    "asun",
+    asun_functions,
     NULL, NULL, NULL, NULL,
-    PHP_MINFO(ason),
+    PHP_MINFO(asun),
     "1.0.0",
     STANDARD_MODULE_PROPERTIES
 };
 
-#ifdef COMPILE_DL_ASON
+#ifdef COMPILE_DL_ASUN
 extern "C" {
-    ZEND_GET_MODULE(ason)
+    ZEND_GET_MODULE(asun)
 }
 #endif

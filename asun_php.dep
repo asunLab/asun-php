@@ -1,5 +1,5 @@
-ason_php.lo: /home/X/dev/ason/ason-php/ason_php.cpp \
- /home/X/dev/ason/ason-php/config.h /usr/include/php/20240924/main/php.h \
+asun_php.lo: /home/X/dev/asun/asun-php/asun_php.cpp \
+ /home/X/dev/asun/asun-php/config.h /usr/include/php/20240924/main/php.h \
  /usr/include/php/20240924/main/php_version.h \
  /usr/include/php/20240924/Zend/zend.h \
  /usr/include/php/20240924/Zend/zend_types.h \
@@ -91,5 +91,5 @@ ason_php.lo: /home/X/dev/ason/ason-php/ason_php.cpp \
  /usr/include/php/20240924/main/php_reentrancy.h \
  /usr/include/php/20240924/ext/standard/info.h \
  /usr/include/php/20240924/Zend/zend_exceptions.h \
- /home/X/dev/ason/ason-php/ason_core.h \
- /home/X/dev/ason/ason-php/ason_simd.h
+ /home/X/dev/asun/asun-php/asun_core.h \
+ /home/X/dev/asun/asun-php/asun_simd.h

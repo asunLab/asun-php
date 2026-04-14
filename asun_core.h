@@ -1,5 +1,5 @@
 #pragma once
-#include "ason_simd.h"
+#include "asun_simd.h"
 #include <string>
 #include <cstring>
 #include <cmath>
@@ -9,7 +9,7 @@
 #include <vector>
 #include <string_view>
 
-namespace ason_core {
+namespace asun_core {
 
 class Error : public std::runtime_error {
 public:
@@ -61,7 +61,7 @@ inline bool needs_quoting(const char* s, size_t len) {
     if (s[0] == ' ' || s[len-1] == ' ') return true;
     if (len == 4 && memcmp(s, "true", 4) == 0) return true;
     if (len == 5 && memcmp(s, "false", 5) == 0) return true;
-    if (ason_simd::has_special_chars((const uint8_t*)s, len)) return true;
+    if (asun_simd::has_special_chars((const uint8_t*)s, len)) return true;
     size_t st = 0; if (len > 0 && s[0] == '-') st = 1;
     if (st < len) {
         bool num = true;
@@ -75,7 +75,7 @@ inline void append_escaped(std::string& buf, const char* s, size_t len) {
     buf.push_back('"');
     size_t start = 0;
     while (start < len) {
-        size_t pos = ason_simd::find_quote_or_special((const uint8_t*)s + start, len - start);
+        size_t pos = asun_simd::find_quote_or_special((const uint8_t*)s + start, len - start);
         buf.append(s + start, pos); start += pos;
         if (start >= len) break;
         switch ((uint8_t)s[start]) {
@@ -141,7 +141,7 @@ inline bool at_value_end(const char* p, const char* e) {
 inline std::string parse_quoted(const char*& p, const char* e) {
     p++;
     const char* start = p;
-    size_t off = ason_simd::find_quote_or_special((const uint8_t*)p, e - p);
+    size_t off = asun_simd::find_quote_or_special((const uint8_t*)p, e - p);
     const char* sc = p + off;
     if (sc < e && *sc == '"') { p = sc + 1; return std::string(start, sc - start); }
     std::string r; if (sc > start) r.append(start, sc - start); p = sc;
@@ -361,4 +361,4 @@ std::string pretty_format(const std::string& compact);
 inline void bin_write_u32(std::string& buf, uint32_t v) { buf.append((const char*)&v, 4); }
 inline uint32_t bin_read_u32(const char*& p) { uint32_t v; memcpy(&v, p, 4); p += 4; return v; }
 
-} // namespace ason_core
+} // namespace asun_core

@@ -1,12 +1,12 @@
-dnl config.m4 for extension ason
+dnl config.m4 for extension asun
 
-PHP_ARG_ENABLE([ason],
-  [whether to enable ason support],
-  [AS_HELP_STRING([--enable-ason],
-    [Enable ason support])],
+PHP_ARG_ENABLE([asun],
+  [whether to enable asun support],
+  [AS_HELP_STRING([--enable-asun],
+    [Enable asun support])],
   [no])
 
-if test "$PHP_ASON" != "no"; then
+if test "$PHP_ASUN" != "no"; then
   dnl Check for C++ compiler
   PHP_REQUIRE_CXX()
 
@@ -26,10 +26,10 @@ if test "$PHP_ASON" != "no"; then
       ;;
   esac
 
-  PHP_ADD_LIBRARY(stdc++, 1, ASON_SHARED_LIBADD)
-  PHP_SUBST(ASON_SHARED_LIBADD)
+  PHP_ADD_LIBRARY(stdc++, 1, ASUN_SHARED_LIBADD)
+  PHP_SUBST(ASUN_SHARED_LIBADD)
 
-  PHP_NEW_EXTENSION(ason, ason_php.cpp, $ext_shared,, $CXXFLAGS)
+  PHP_NEW_EXTENSION(asun, asun_php.cpp, $ext_shared,, $CXXFLAGS)
 
   PHP_ADD_MAKEFILE_FRAGMENT
 fi

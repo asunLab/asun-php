@@ -1,19 +1,19 @@
 <?php
 /**
- * ASON PHP - Complex Examples
+ * ASUN PHP - Complex Examples
  */
-echo "=== ASON Complex Examples ===\n\n";
+echo "=== ASUN Complex Examples ===\n\n";
 
 // 1. Nested struct
 echo "1. Nested struct:\n";
-$emp = ason_decode('{id@int,name@str,dept@{title@str},skills@[str],active@bool}:(1,Alice,(Manager),[rust],true)');
+$emp = asun_decode('{id@int,name@str,dept@{title@str},skills@[str],active@bool}:(1,Alice,(Manager),[rust],true)');
 $deptTitle = is_array($emp['dept']) && isset($emp['dept']['title']) ? $emp['dept']['title'] : (is_array($emp['dept']) ? $emp['dept'][0] : $emp['dept']);
 echo "   {ID:{$emp['id']} Name:{$emp['name']} Dept:{Title:{$deptTitle}} Skills:[{$emp['skills'][0]}] Active:" . ($emp['active']?'true':'false') . "}\n\n";
 
 // 2. Vec with nested structs
 echo "2. Vec with nested structs:\n";
 $input2 = "[{id@int,name@str,dept@{title@str},skills@[str],active@bool}]:\n  (1, Alice, (Manager), [Rust, Go], true),\n  (2, Bob, (Engineer), [Python], false),\n  (3, \"Carol Smith\", (Director), [Leadership, Strategy], true)";
-$employees = ason_decode($input2);
+$employees = asun_decode($input2);
 foreach ($employees as $e) {
     $deptTitle = is_array($e['dept']) && isset($e['dept']['title']) ? $e['dept']['title'] : (is_array($e['dept']) ? $e['dept'][0] : $e['dept']);
     echo "   {ID:{$e['id']} Name:{$e['name']} Dept:{Title:{$deptTitle}} Skills:[" . implode(' ', $e['skills']) . "] Active:" . ($e['active']?'true':'false') . "}\n";
@@ -21,35 +21,35 @@ foreach ($employees as $e) {
 
 // 3. Key-value entry list
 echo "\n3. Key-value entry list:\n";
-$wm = ason_decode('{name@str,attrs@[{key@str,value@int}]}:(Alice,[(age,30),(score,95)])');
+$wm = asun_decode('{name@str,attrs@[{key@str,value@int}]}:(Alice,[(age,30),(score,95)])');
 echo "   {Name:{$wm['name']} Attrs:[" . $wm['attrs'][0][0] . ":" . $wm['attrs'][0][1] . " " . $wm['attrs'][1][0] . ":" . $wm['attrs'][1][1] . "]}\n";
 
 // 4. Nested struct roundtrip
 echo "\n4. Nested struct roundtrip:\n";
 $nested = ['name' => 'Alice', 'addr' => ['city' => 'NYC', 'zip' => 10001]];
-$s = ason_encode($nested);
+$s = asun_encode($nested);
 echo "   serialized:   $s\n";
-$nested2 = ason_decode($s);
+$nested2 = asun_decode($s);
 echo "   ✓ roundtrip OK\n";
 
 // 5. Escaped strings
 echo "\n5. Escaped strings:\n";
 $note = ['text' => "say \"hi\", then (wave)\tnewline\nend"];
-$s = ason_encode($note);
+$s = asun_encode($note);
 echo "   serialized:   $s\n";
 echo "   ✓ escape roundtrip OK\n";
 
 // 6. Float fields
 echo "\n6. Float fields:\n";
 $m = ['id' => 2, 'value' => 95.0, 'label' => 'score'];
-$s = ason_encode($m);
+$s = asun_encode($m);
 echo "   serialized: $s\n";
 echo "   ✓ float roundtrip OK\n";
 
 // 7. Negative numbers
 echo "\n7. Negative numbers:\n";
 $n = ['a' => -42, 'b' => -3.14, 'c' => -9223372036854775807];
-$s = ason_encode($n);
+$s = asun_encode($n);
 echo "   serialized:   $s\n";
 echo "   ✓ negative roundtrip OK\n";
 
@@ -66,7 +66,7 @@ $all = [
     'vec_str' => ["alpha", "beta gamma", "delta"],
     'nested_vec' => [[1, 2], [3, 4, 5]]
 ];
-$s = ason_encode($all);
+$s = asun_encode($all);
 echo "   serialized (" . strlen($s) . " bytes):\n";
 echo "   $s\n";
 echo "   ✓ all-types roundtrip OK\n";
@@ -106,15 +106,15 @@ $country = [
         ]]
     ]
 ];
-$s = ason_encode($country);
+$s = asun_encode($country);
 echo "   serialized (" . strlen($s) . " bytes)\n";
 echo "   first 200 chars: " . substr($s, 0, 200) . "...\n";
-echo "   ✓ 5-level ASON-text roundtrip OK\n";
+echo "   ✓ 5-level ASUN-text roundtrip OK\n";
 
-$binBytes = ason_encodeBinary($country);
-echo "   ✓ 5-level ASON-bin roundtrip OK\n";
+$binBytes = asun_encodeBinary($country);
+echo "   ✓ 5-level ASUN-bin roundtrip OK\n";
 $jsonBytes = json_encode($country);
-echo "   ASON text: " . strlen($s) . " B | ASON bin: " . strlen($binBytes) . " B | JSON: " . strlen($jsonBytes) . " B\n";
+echo "   ASUN text: " . strlen($s) . " B | ASUN bin: " . strlen($binBytes) . " B | JSON: " . strlen($jsonBytes) . " B\n";
 echo "   BIN vs JSON: " . round((1.0-strlen($binBytes)/strlen($jsonBytes))*100) . "% smaller | TEXT vs JSON: " . round((1.0-strlen($s)/strlen($jsonBytes))*100) . "% smaller\n";
 
 // 10. 7-level deep (skipping full boilerplate but showing message)
@@ -144,13 +144,13 @@ $universe = [
         ]
     ]
 ];
-$s = ason_encode($universe);
+$s = asun_encode($universe);
 echo "   serialized (" . strlen($s) . " bytes)\n";
-echo "   ✓ 7-level ASON-text roundtrip OK\n";
-$uniBin = ason_encodeBinary($universe);
-echo "   ✓ 7-level ASON-bin roundtrip OK\n";
+echo "   ✓ 7-level ASUN-text roundtrip OK\n";
+$uniBin = asun_encodeBinary($universe);
+echo "   ✓ 7-level ASUN-bin roundtrip OK\n";
 $jsonBytes = json_encode($universe);
-echo "   ASON text: " . strlen($s) . " B | ASON bin: " . strlen($uniBin) . " B | JSON: " . strlen($jsonBytes) . " B\n";
+echo "   ASUN text: " . strlen($s) . " B | ASUN bin: " . strlen($uniBin) . " B | JSON: " . strlen($jsonBytes) . " B\n";
 echo "   BIN vs JSON: " . round((1.0-strlen($uniBin)/strlen($jsonBytes))*100) . "% smaller | TEXT vs JSON: " . round((1.0-strlen($s)/strlen($jsonBytes))*100) . "% smaller\n";
 
 // 11. Service config
@@ -167,15 +167,15 @@ $config = [
         ['key' => 'SECRET_KEY', 'value' => 'abc123!@#'],
     ]
 ];
-$s = ason_encode($config);
+$s = asun_encode($config);
 echo "   serialized (" . strlen($s) . " bytes):\n";
 echo "   $s\n";
-echo "   ✓ config ASON-text roundtrip OK\n";
+echo "   ✓ config ASUN-text roundtrip OK\n";
 $jsonBytes = json_encode($config);
-echo "   ASON text: " . strlen($s) . " B | JSON: " . strlen($jsonBytes) . " B | TEXT vs JSON: " . round((1.0-strlen($s)/strlen($jsonBytes))*100) . "% smaller\n";
-$cfgBin = ason_encodeBinary($config);
-echo "   ✓ config ASON-bin roundtrip OK\n";
-echo "   ASON bin: " . strlen($cfgBin) . " B | BIN vs JSON: " . round((1.0-strlen($cfgBin)/strlen($jsonBytes))*100) . "% smaller\n";
+echo "   ASUN text: " . strlen($s) . " B | JSON: " . strlen($jsonBytes) . " B | TEXT vs JSON: " . round((1.0-strlen($s)/strlen($jsonBytes))*100) . "% smaller\n";
+$cfgBin = asun_encodeBinary($config);
+echo "   ✓ config ASUN-bin roundtrip OK\n";
+echo "   ASUN bin: " . strlen($cfgBin) . " B | BIN vs JSON: " . round((1.0-strlen($cfgBin)/strlen($jsonBytes))*100) . "% smaller\n";
 
 // 12. Large structure (100)
 echo "\n12. Large structure (100 countries × nested regions):\n";
@@ -209,20 +209,20 @@ for ($i=0; $i<100; $i++) {
     $countries[] = ['name' => "Country_{$i}", 'code' => sprintf("C%02d", $i%100), 'population' => 1000000 + $i*500000, 'gdp_trillion' => $i * 0.5, 'regions' => $regions];
 }
 
-$totalASON = 0; $totalJSON = 0; $totalBIN = 0;
+$totalASUN = 0; $totalJSON = 0; $totalBIN = 0;
 foreach ($countries as $c) {
-    $as = ason_encode($c);
+    $as = asun_encode($c);
     $js = json_encode($c);
-    $bs = ason_encodeBinary($c);
-    $totalASON += strlen($as);
+    $bs = asun_encodeBinary($c);
+    $totalASUN += strlen($as);
     $totalJSON += strlen($js);
     $totalBIN += strlen($bs);
 }
 echo "   100 countries with 5-level nesting:\n";
-echo "   Total ASON text: $totalASON bytes (" . number_format($totalASON/1024, 1) . " KB)\n";
-echo "   Total ASON bin:  $totalBIN bytes (" . number_format($totalBIN/1024, 1) . " KB)\n";
+echo "   Total ASUN text: $totalASUN bytes (" . number_format($totalASUN/1024, 1) . " KB)\n";
+echo "   Total ASUN bin:  $totalBIN bytes (" . number_format($totalBIN/1024, 1) . " KB)\n";
 echo "   Total JSON:      $totalJSON bytes (" . number_format($totalJSON/1024, 1) . " KB)\n";
-echo "   TEXT vs JSON: " . round((1.0-$totalASON/$totalJSON)*100) . "% smaller | BIN vs JSON: " . round((1.0-$totalBIN/$totalJSON)*100) . "% smaller\n";
+echo "   TEXT vs JSON: " . round((1.0-$totalASUN/$totalJSON)*100) . "% smaller | BIN vs JSON: " . round((1.0-$totalBIN/$totalJSON)*100) . "% smaller\n";
 echo "   ✓ all 100 countries roundtrip OK (text + bin)\n";
 
 // 13. Schema parsing
@@ -233,24 +233,24 @@ echo "   Building at depth 6: {Name:HQ Floors:10 Residential:false HeightM:45}\n
 // 14. Typed
 echo "\n14. Typed serialization (MarshalTyped):\n";
 $empForTyped = ['id'=>1, 'name'=>'Alice', 'dept'=>['title'=>'Engineering'], 'skills'=>['Rust','Go'], 'active'=>true];
-$typedBytes = ason_encodeTyped($empForTyped);
+$typedBytes = asun_encodeTyped($empForTyped);
 echo "   nested struct: $typedBytes\n";
 echo "   ✓ typed nested struct roundtrip OK\n";
-$allTyped = ason_encodeTyped($all);
+$allTyped = asun_encodeTyped($all);
 echo "   all-types (" . strlen($allTyped) . " bytes): " . substr($allTyped, 0, 80) . "...\n";
 echo "   ✓ typed all-types roundtrip OK\n";
-$configTyped = ason_encodeTyped($config);
+$configTyped = asun_encodeTyped($config);
 echo "   config (" . strlen($configTyped) . " bytes): " . substr($configTyped, 0, 100) . "...\n";
 echo "   ✓ typed config roundtrip OK\n";
-$untyped = ason_encode($config);
+$untyped = asun_encode($config);
 echo "   untyped: " . strlen($untyped) . " bytes | typed: " . strlen($configTyped) . " bytes | overhead: " . (strlen($configTyped) - strlen($untyped)) . " bytes\n";
 
 // 15. Edge cases
 echo "\n15. Edge cases:\n";
 $wv = ['items' => []];
-echo "   empty vec: " . ason_encode($wv) . "\n";
+echo "   empty vec: " . asun_encode($wv) . "\n";
 $sp = ['val' => "tabs\there, newlines\nhere, quotes\"and\\backslash"];
-echo "   special chars: " . ason_encode($sp) . "\n";
+echo "   special chars: " . asun_encode($sp) . "\n";
 echo "   bool-like string: {val}:(\"true\")\n";
 echo "   number-like string: {val}:(\"12345\")\n";
 echo "   ✓ all edge cases OK\n";
@@ -258,7 +258,7 @@ echo "   ✓ all edge cases OK\n";
 // 16. Triple nested
 echo "\n16. Triple-nested arrays:\n";
 $m3 = ['data' => [[[1,2],[3,4]],[[5,6,7],[8]]]];
-$s = ason_encode($m3);
+$s = asun_encode($m3);
 echo "   $s\n";
 echo "   ✓ triple-nested array roundtrip OK\n";
 

@@ -1,8 +1,8 @@
 <?php
 /**
- * ASON PHP benchmark.
+ * ASUN PHP benchmark.
  *
- * Output style matches the repository's JSON / ASON / BIN benchmark format.
+ * Output style matches the repository's JSON / ASUN / BIN benchmark format.
  */
 
 function generateUsers(int $n): array {
@@ -202,34 +202,34 @@ function printSection(string $title, int $width = 68): void {
 function printResult(
     string $name,
     float $jsonSerMs,
-    float $asonSerMs,
+    float $asunSerMs,
     float $binSerMs,
     float $jsonDeMs,
-    float $asonDeMs,
+    float $asunDeMs,
     float $binDeMs,
     int $jsonBytes,
-    int $asonBytes,
+    int $asunBytes,
     int $binBytes
 ): void {
     echo "  {$name}\n";
     printf(
-        "    Serialize:   JSON %8.2fms/%dB | ASON %8.2fms(%s)/%dB(%s) | BIN %8.2fms(%s)/%dB(%s)\n",
+        "    Serialize:   JSON %8.2fms/%dB | ASUN %8.2fms(%s)/%dB(%s) | BIN %8.2fms(%s)/%dB(%s)\n",
         $jsonSerMs,
         $jsonBytes,
-        $asonSerMs,
-        formatRatio($jsonSerMs, $asonSerMs),
-        $asonBytes,
-        formatPercent($asonBytes, $jsonBytes),
+        $asunSerMs,
+        formatRatio($jsonSerMs, $asunSerMs),
+        $asunBytes,
+        formatPercent($asunBytes, $jsonBytes),
         $binSerMs,
         formatRatio($jsonSerMs, $binSerMs),
         $binBytes,
         formatPercent($binBytes, $jsonBytes)
     );
     printf(
-        "    Deserialize: JSON %8.2fms | ASON %8.2fms(%s) | BIN %8.2fms(%s)\n",
+        "    Deserialize: JSON %8.2fms | ASUN %8.2fms(%s) | BIN %8.2fms(%s)\n",
         $jsonDeMs,
-        $asonDeMs,
-        formatRatio($jsonDeMs, $asonDeMs),
+        $asunDeMs,
+        formatRatio($jsonDeMs, $asunDeMs),
         $binDeMs,
         formatRatio($jsonDeMs, $binDeMs)
     );
@@ -237,27 +237,27 @@ function printResult(
 
 function runCase(string $name, mixed $value, array $binarySchema, int $iterations): void {
     $jsonData = json_encode($value, JSON_UNESCAPED_UNICODE);
-    $asonData = ason_encodeTyped($value);
-    $binData = ason_encodeBinary($value);
+    $asunData = asun_encodeTyped($value);
+    $binData = asun_encodeBinary($value);
 
     $jsonSerMs = bench(static fn() => json_encode($value, JSON_UNESCAPED_UNICODE), $iterations);
-    $asonSerMs = bench(static fn() => ason_encodeTyped($value), $iterations);
-    $binSerMs = bench(static fn() => ason_encodeBinary($value), $iterations);
+    $asunSerMs = bench(static fn() => asun_encodeTyped($value), $iterations);
+    $binSerMs = bench(static fn() => asun_encodeBinary($value), $iterations);
 
     $jsonDeMs = bench(static fn() => json_decode($jsonData, true), $iterations);
-    $asonDeMs = bench(static fn() => ason_decode($asonData), $iterations);
-    $binDeMs = bench(static fn() => ason_decodeBinary($binData, $binarySchema), $iterations);
+    $asunDeMs = bench(static fn() => asun_decode($asunData), $iterations);
+    $binDeMs = bench(static fn() => asun_decodeBinary($binData, $binarySchema), $iterations);
 
     printResult(
         $name,
         $jsonSerMs,
-        $asonSerMs,
+        $asunSerMs,
         $binSerMs,
         $jsonDeMs,
-        $asonDeMs,
+        $asunDeMs,
         $binDeMs,
         strlen($jsonData),
-        strlen($asonData),
+        strlen($asunData),
         strlen($binData)
     );
 }
@@ -304,49 +304,49 @@ function runThroughputSection(): void {
     printSection("Section 6: Throughput Summary");
     $rows = generateUsers(1000);
     $jsonData = json_encode($rows, JSON_UNESCAPED_UNICODE);
-    $asonData = ason_encodeTyped($rows);
-    $binData = ason_encodeBinary($rows);
+    $asunData = asun_encodeTyped($rows);
+    $binData = asun_encodeBinary($rows);
     $iters = 100;
     $totalRecords = count($rows) * $iters;
 
     $jsonSerMs = bench(static fn() => json_encode($rows, JSON_UNESCAPED_UNICODE), $iters);
-    $asonSerMs = bench(static fn() => ason_encodeTyped($rows), $iters);
-    $binSerMs = bench(static fn() => ason_encodeBinary($rows), $iters);
+    $asunSerMs = bench(static fn() => asun_encodeTyped($rows), $iters);
+    $binSerMs = bench(static fn() => asun_encodeBinary($rows), $iters);
     $jsonDeMs = bench(static fn() => json_decode($jsonData, true), $iters);
-    $asonDeMs = bench(static fn() => ason_decode($asonData), $iters);
-    $binDeMs = bench(static fn() => ason_decodeBinary($binData, [flatSchema()]), $iters);
+    $asunDeMs = bench(static fn() => asun_decode($asunData), $iters);
+    $binDeMs = bench(static fn() => asun_decodeBinary($binData, [flatSchema()]), $iters);
 
     $jsonSerRps = $totalRecords / ($jsonSerMs / 1000.0);
-    $asonSerRps = $totalRecords / ($asonSerMs / 1000.0);
+    $asunSerRps = $totalRecords / ($asunSerMs / 1000.0);
     $binSerRps = $totalRecords / ($binSerMs / 1000.0);
     $jsonDeRps = $totalRecords / ($jsonDeMs / 1000.0);
-    $asonDeRps = $totalRecords / ($asonDeMs / 1000.0);
+    $asunDeRps = $totalRecords / ($asunDeMs / 1000.0);
     $binDeRps = $totalRecords / ($binDeMs / 1000.0);
 
     printf(
-        "  Serialize throughput:   JSON %12s rec/s | ASON %12s rec/s (%s) | BIN %12s rec/s (%s)\n",
+        "  Serialize throughput:   JSON %12s rec/s | ASUN %12s rec/s (%s) | BIN %12s rec/s (%s)\n",
         number_format($jsonSerRps, 0, '.', ','),
-        number_format($asonSerRps, 0, '.', ','),
-        formatRatio($asonSerRps, $jsonSerRps),
+        number_format($asunSerRps, 0, '.', ','),
+        formatRatio($asunSerRps, $jsonSerRps),
         number_format($binSerRps, 0, '.', ','),
         formatRatio($binSerRps, $jsonSerRps)
     );
     printf(
-        "  Deserialize throughput: JSON %12s rec/s | ASON %12s rec/s (%s) | BIN %12s rec/s (%s)\n",
+        "  Deserialize throughput: JSON %12s rec/s | ASUN %12s rec/s (%s) | BIN %12s rec/s (%s)\n",
         number_format($jsonDeRps, 0, '.', ','),
-        number_format($asonDeRps, 0, '.', ','),
-        formatRatio($asonDeRps, $jsonDeRps),
+        number_format($asunDeRps, 0, '.', ','),
+        formatRatio($asunDeRps, $jsonDeRps),
         number_format($binDeRps, 0, '.', ','),
         formatRatio($binDeRps, $jsonDeRps)
     );
-    printf("  Size baseline (1k rows): JSON %dB | ASON %dB(%s) | BIN %dB(%s)\n\n", strlen($jsonData), strlen($asonData), formatPercent(strlen($asonData), strlen($jsonData)), strlen($binData), formatPercent(strlen($binData), strlen($jsonData)));
+    printf("  Size baseline (1k rows): JSON %dB | ASUN %dB(%s) | BIN %dB(%s)\n\n", strlen($jsonData), strlen($asunData), formatPercent(strlen($asunData), strlen($jsonData)), strlen($binData), formatPercent(strlen($binData), strlen($jsonData)));
 }
 
 echo "╔══════════════════════════════════════════════════════════════╗\n";
-echo "║                ASON PHP vs JSON Benchmark                    ║\n";
+echo "║                ASUN PHP vs JSON Benchmark                    ║\n";
 echo "╚══════════════════════════════════════════════════════════════╝\n\n";
 echo "System: " . php_uname('s') . " " . php_uname('m') . " | PHP " . PHP_VERSION . "\n";
-echo "Mode: compact JSON vs typed ASON text vs ASON binary\n";
+echo "Mode: compact JSON vs typed ASUN text vs ASUN binary\n";
 echo "Scope: structs, nested arrays, entry-object lists\n\n";
 
 runFlatSection();
