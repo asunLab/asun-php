@@ -276,7 +276,7 @@ inline Schema parse_schema(const char*& p, const char* e) {
             const char* st = p;
             while (p < e) {
                 char b = *p;
-                if (b == '<' || b == '>') throw Error("legacy map syntax '<...>' is not supported");
+                if (b == '<' || b == '>') throw Error("unsupported schema syntax");
                 if (b == ',' || b == '}' || b == '@' || b == ' ' || b == '\t') break;
                 p++;
             }

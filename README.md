@@ -20,6 +20,37 @@ ASUN (~35 tokens, 65% saving):
 [{id@int, name@str, active@bool}]:(1,Alice,true),(2,Bob,false)
 ```
 
+---
+
+## Why ASUN?
+
+**json**
+
+Standard JSON repeats every field name in every record. When you send structured data to an LLM, over an API, or across services, that repetition wastes tokens, bytes, and attention:
+
+```json
+[
+  { "id": 1, "name": "Alice", "active": true },
+  { "id": 2, "name": "Bob", "active": false },
+  { "id": 3, "name": "Carol", "active": true }
+]
+```
+
+**asun**
+
+ASUN declares the schema **once** and streams data as compact tuples:
+
+```asun
+[{id, name, active}]:
+  (1,Alice,true),
+  (2,Bob,false),
+  (3,Carol,true)
+```
+
+**Fewer tokens. Smaller payloads. Clearer structure, and faster parsing than repeated-object JSON.**
+
+---
+
 ## Current Syntax
 
 - `@` is the field binding marker, for example `{id@int,name@str}`.
